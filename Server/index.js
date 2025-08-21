@@ -17,16 +17,13 @@ const port = process.env.PORT || 3001;
 
 connectDB();
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 app.use('/api/users', userRoutes);
 app.use('/api/patients' , patientRoutes)
 
-// Multer for file upload
 const upload = multer({ storage: multer.memoryStorage() });
 
-// Accept one image at a time with field name 'file'
 app.post('/analyze', upload.single('file'), async (req, res) => {
   try {
     const { patientId } = req.query;
@@ -36,13 +33,11 @@ app.post('/analyze', upload.single('file'), async (req, res) => {
       return res.status(400).json({ success: false, message: 'Missing file or patientId' });
     }
 
-    // Find the user by patientId
     const user = await User.findOne({ patientId });
     if (!user) {
       return res.status(404).json({ success: false, message: 'User not found with given patientId' });
     }
 
-    // Send image to FastAPI for prediction
     const formData = new FormData();
     formData.append('file', file.buffer, {
       filename: file.originalname,
@@ -57,17 +52,12 @@ app.post('/analyze', upload.single('file'), async (req, res) => {
 
      console.log('Saving prediction result:', response.data);
 
- 
-
-    // Save result to DB
    
     const savedResult = await PredictionResult.create(result);
-
-    // Add result to user's predictionResults
+ts
     user.predictionResults.push(savedResult._id);
     await user.save();
 
-    // Return updated user with populated predictionResults
     const updatedUser = await User.findById(user._id).populate('predictionResults');
 
     res.status(200).json({
