@@ -18,4 +18,10 @@ router.post('/form', async (req, res) => {
       patientId: user.patientId,
       user
     });
+  } catch (err) {
+    console.error('❌ Failed to save user:', err);
+    res.status(400).json({ success: false, message: err.message });
   }
+});
+
+export default router;
