@@ -109,7 +109,7 @@ The application will be live at `http://localhost:5173`.
 For questions, issues, or to request access to the trained model file:
 
 📧 **Email:** adithyayadav641@gmail.com
-🐛 **Issues:** [GitHub Issues](https://www.google.com/search?q=https://github.com/AR-47/EyeCancer/issues)
+🐛 **Issues:** [GitHub Issues](https://github.comAR-47/EyeCancer/issues)
 
 ```
 ```
