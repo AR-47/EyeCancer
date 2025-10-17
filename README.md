@@ -111,5 +111,3 @@ For questions, issues, or to request access to the trained model file:
 📧 **Email:** adithyayadav641@gmail.com
 🐛 **Issues:** [GitHub Issues](https://github.comAR-47/EyeCancer/issues)
 
-```
-```
