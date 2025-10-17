@@ -32,7 +32,7 @@ The application is structured into three distinct services:
 
 The trained machine learning model file (`best_eye_cancer_model.h5`) is **essential** for the AI Model service to start and perform diagnostics.
 
-The file is too large to be uploaded to GitHub. **If you need access to the model file, please contact the author via email.**
+The file is too large to be uploaded to GitHub. **If you need access to the model file, please contact via email.**
 
 -----
 
