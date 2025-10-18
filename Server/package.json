@@ -7,8 +7,8 @@
   "scripts": {
     "start": "node index.js"
   },
-  "author": "Aanya Singh",
-  "license": "ISC",
+  "author": "Adithya YYadav",
+  "license": "MIT",
   "dependencies": {
     "axios": "^1.10.0",
     "cors": "^2.8.5",
