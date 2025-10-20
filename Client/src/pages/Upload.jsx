@@ -99,7 +99,6 @@ export default function Upload() {
             navigate("/result", {
                 state: {
                   cancerDetected: response.data.result.classification_prediction === 1,
-                  // FIX APPLIED HERE: Must use index [0] to retrieve the single probability score
                   cancerProbability: response.data.result.classification_probabilities[0],
                   message: response.data.result.message,
                   success: true,
@@ -107,12 +106,12 @@ export default function Upload() {
                     base64: response.data.result.segmentation_mask_base64,
                   },
                   maskedImage: {
-                    base64: response.data.result.overlay_image_base64, // ✅ overlay = masked
+                    base64: response.data.result.overlay_image_base64,
                   },
                   originalImage: {
-                    base64: selectedImages[0].preview.split(',')[1],
+                    base64: response.data.result.original_image_base64 || selectedImages[0].preview.split(',')[1],
                   },
-                  user: response.data.user // Pass user data to Result page
+                  user: response.data.user
                 }
               });
               
@@ -120,7 +119,22 @@ export default function Upload() {
 
         } catch (error) {
             console.error('Error uploading images:', error);
-            alert('Upload failed. Please check the console for details.');
+
+            let errorMessage = 'An unknown error occurred during upload. Please check your network connection.';
+            
+            if (error.response) {
+              const serverMessage = error.response.data?.message;
+              if (serverMessage) {
+                errorMessage = serverMessage;
+              } else {
+                errorMessage = `Server Error (${error.response.status}). See console for details.`;
+              }
+            } else if (error.request) {
+              errorMessage = 'Network Error: Cannot connect to the API Gateway (localhost:3001).';
+            }
+            
+            alert(`❌ Upload failed: ${errorMessage}`);
+            
         } finally {
             setIsUploading(false);
         }

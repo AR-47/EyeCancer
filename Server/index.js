@@ -49,26 +49,21 @@ app.post('/analyze', upload.single('file'), async (req, res) => {
       contentType: file.mimetype,
     });
 
+    // CRITICAL: Ensure the response structure is handled carefully
     const response = await axios.post('http://localhost:8000/predict', formData, {
       headers: formData.getHeaders(),
     });
 
-    const aiResult  = response.data; // Capture AI service response
+    const aiResult  = response.data;
 
     console.log('Saving prediction result:', aiResult);
 
     // 🛑 CRITICAL FIX: Explicitly map FastAPI keys to Mongoose schema keys
     const dbPayload = {
-        // Convert the string class name to the required numeric ID (1 for Disease/Abnormal, 0 otherwise)
         classification_prediction: aiResult.prediction_class === 'Disease/Abnormal' ? 1 : 0, 
         
-        // Wrap the single probability score into the required array format
         classification_probabilities: [aiResult.probability_score], 
         
-        // The AI Service (main.py) must be returning these base64 fields 
-        // OR you need logic here to set them if they are missing.
-        // Assuming AI service *will* return them as keys on aiResult, 
-        // otherwise they will be saved as undefined/null.
         original_image_base64: aiResult.original_image_base64,
         overlay_image_base64: aiResult.overlay_image_base64,
         segmentation_mask_base64: aiResult.segmentation_mask_base64,
@@ -95,7 +90,23 @@ app.post('/analyze', upload.single('file'), async (req, res) => {
 
   } catch (error) {
     console.error('Error in /analyze:', error.message);
-    res.status(500).json({ success: false, error: error.message });
+    
+    // --- START OF CRITICAL ERROR HANDLING FIX ---
+    if (error.response) {
+        const statusCode = error.response.status;
+        const aiError = error.response.data;
+
+        if (statusCode >= 400 && statusCode < 500) {
+            return res.status(statusCode).json({ 
+                success: false, 
+                message: aiError.message || 'Client-side issue detected by AI service.',
+                details: aiError 
+            });
+        }
+    }
+
+    // Default to a 500 server error for all other unhandled issues
+    res.status(500).json({ success: false, message: 'Internal server error during analysis.' });
   }
 });
 
