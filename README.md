@@ -9,7 +9,7 @@
 ## ✨ Project Features
 
   * **Secure Patient Intake:** Captures and validates essential patient demographic and medical history through a dedicated **React** form.
-  * **Machine Learning Diagnostics:** Employs a **TensorFlow/Keras ResNet50 model** hosted on a dedicated Python service for binary classification (Normal/Disease).
+  * **Machine Learning Diagnostics:** Employs a **Keras ResNet50 model** hosted on a dedicated Python service for binary classification (Normal/Disease).
   * **Historical Data Persistence:** Patient records (`User`) and all associated scan results (`PredictionResult`) are stored and linked in a **MongoDB** database using Mongoose.
   * **API Gateway:** The Node.js Express server manages secure data flow, handling file uploads and routing requests between the client, database, and ML service.
   * **Modern Interface:** Built with **React** and styled using **Tailwind CSS** for a clean, responsive web application.
