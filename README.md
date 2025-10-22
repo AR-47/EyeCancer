@@ -53,8 +53,6 @@ The complete training notebook (`model_train.ipynb`) is included in this reposit
 (False Negatives: 0, True Positives: 79)
 ```
 
-> 📘 *Click here to see the full training notebook: [`model_train.ipynb`](./model_train.ipynb)*
-
 ---
 
 ## 💻 Architecture & Tech Stack
@@ -162,15 +160,6 @@ You can read the full paper here:
 
 ---
 
-## 🐛 Bugs and Support
-
-For any issues, questions, or model file access requests:
-
-* 📧 **Email:** [adithyayadav641@gmail.com](mailto:adithyayadav641@gmail.com)
-* 🧾 **GitHub Issues:** [Open an Issue](../../issues)
-
----
-
 ## 📁 Project Structure
 
 ```
@@ -194,5 +183,9 @@ EyeCancer/
 │
 └── README.md
 ```
+## 🐛 Bugs and Support
 
+For any issues, questions, or model file access requests:
+
+* 📧 **Email:** [adithyayadav641@gmail.com](mailto:adithyayadav641@gmail.com)
 ---
