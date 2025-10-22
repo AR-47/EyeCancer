@@ -156,32 +156,6 @@ This project has been published as part of an academic and applied research init
 You can read the full paper here:
 🔗 [**An Integrated Three-Tier Microservice Architecture for Deploying State-of-the-Art Ocular Cancer Detection Models**](https://doi.org/10.5281/zenodo.17409492)
 
-*(Replace the above link with your actual publication URL — e.g., IEEE, Springer, or Medium.)*
-
----
-
-## 📁 Project Structure
-
-```
-EyeCancer/
-│
-├── AI-Model/
-│   ├── main.py
-│   ├── best_eye_cancer_model.h5
-│   └── model_train.ipynb
-│
-├── Server/
-│   ├── server.js
-│   ├── routes/
-│   ├── models/
-│   └── .env
-│
-├── Client/
-│   ├── src/
-│   ├── public/
-│   └── vite.config.js
-│
-└── README.md
 ```
 ## 🐛 Bugs and Support
 
