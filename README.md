@@ -1,9 +1,3 @@
-Absolutely — yes, that’s a great idea. Adding a **publication link** gives your project more credibility and a professional touch, especially if you plan to share it on GitHub, LinkedIn, or in your grad applications.
-
-Here’s your **final polished `README.md`** with a proper *Publication* section added near the end (you can replace the placeholder link with your actual paper or article link later):
-
----
-
 # 👁️ Eye Cancer Detection System
 
 ### A Full-Stack Machine Learning Platform for Ocular Disease Screening
