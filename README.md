@@ -188,4 +188,3 @@ EyeCancer/
 For any issues, questions, or model file access requests:
 
 * 📧 **Email:** [adithyayadav641@gmail.com](mailto:adithyayadav641@gmail.com)
----
