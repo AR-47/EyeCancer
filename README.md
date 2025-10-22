@@ -1,113 +1,204 @@
+Absolutely — yes, that’s a great idea. Adding a **publication link** gives your project more credibility and a professional touch, especially if you plan to share it on GitHub, LinkedIn, or in your grad applications.
+
+Here’s your **final polished `README.md`** with a proper *Publication* section added near the end (you can replace the placeholder link with your actual paper or article link later):
+
+---
+
 # 👁️ Eye Cancer Detection System
 
-**A Full-Stack, Machine Learning Platform for Ocular Disease Screening**
+### A Full-Stack Machine Learning Platform for Ocular Disease Screening
 
-🔬🧠 This system uses a **Deep Learning (ML)** model to classify eye images, integrated within a modern three-tier microservice architecture.
+---
 
------
+## 🔬 Overview
 
-## ✨ Project Features
+The **Eye Cancer Detection System** is a full-stack web application designed to detect ocular diseases using Deep Learning.
+It integrates a **ResNet50** model within a **three-tier microservice architecture**, ensuring modularity, scalability, and security.
 
-  * **Secure Patient Intake:** Captures and validates essential patient demographic and medical history through a dedicated **React** form.
-  * **Machine Learning Diagnostics:** Employs a **Keras ResNet50 model** hosted on a dedicated Python service for binary classification (Normal/Disease).
-  * **Historical Data Persistence:** Patient records (`User`) and all associated scan results (`PredictionResult`) are stored and linked in a **MongoDB** database using Mongoose.
-  * **API Gateway:** The Node.js Express server manages secure data flow, handling file uploads and routing requests between the client, database, and ML service.
-  * **Modern Interface:** Built with **React** and styled using **Tailwind CSS** for a clean, responsive web application.
+---
 
------
+## ✨ Features
+
+* **Secure Patient Intake**
+  Captures and validates essential patient demographic and medical information through a React-based form.
+
+* **Machine Learning Diagnostics**
+  Utilizes a **Keras ResNet50** model hosted on a dedicated Python FastAPI service for binary classification (*Normal / Disease*).
+
+* **Historical Data Persistence**
+  Stores all patient records (`User`) and scan results (`PredictionResult`) in **MongoDB** using **Mongoose ORM**.
+
+* **API Gateway**
+  The **Node.js Express** backend manages data flow, file uploads, and communication between the client, database, and ML service.
+
+* **Modern UI**
+  Built with **React (Vite)** and styled with **Tailwind CSS** for a clean, responsive user interface.
+
+---
+
+## 🔬 Model Performance & Validation
+
+The model was trained using a professional, two-phase **transfer learning** approach.
+The complete training notebook (`model_train.ipynb`) is included in this repository.
+
+### Final Evaluation on 100-Sample Test Set
+
+| Class        |  Precision | Recall | F1-Score | Support |
+| :----------- | :--------: | :----: | :------: | :-----: |
+| 0 (Normal)   |   1.0000   | 1.0000 |  1.0000  |    21   |
+| 1 (Disease)  |   1.0000   | 1.0000 |  1.0000  |    79   |
+| **Accuracy** | **1.0000** |        |          | **100** |
+
+**Confusion Matrix:**
+
+```
+[[21  0]
+ [ 0 79]]
+
+(True Negatives: 21, False Positives: 0)
+(False Negatives: 0, True Positives: 79)
+```
+
+> 📘 *Click here to see the full training notebook: [`model_train.ipynb`](./model_train.ipynb)*
+
+---
 
 ## 💻 Architecture & Tech Stack
 
-The application is structured into three distinct services:
+The project is divided into three independent services:
 
-| Component | Technology | Core Libraries | Port | Directory |
-| :--- | :--- | :--- | :--- | :--- |
-| **Client** | **React, Vite** | `react-router-dom`, `axios`, `tailwindcss` | `5173` | `Client/` |
-| **Server** | **Node.js, Express** | `mongoose`, `multer`, `axios`, `dotenv` | `3001` | `Server/` |
-| **ML Model** | **Python, FastAPI** | `tensorflow`, `numpy`, `uvicorn` | `8000` | `AI-Model/` |
+| Component    | Technology        | Core Libraries                             | Port | Directory   |
+| :----------- | :---------------- | :----------------------------------------- | :--: | :---------- |
+| **Client**   | React (Vite)      | `react-router-dom`, `axios`, `tailwindcss` | 5173 | `Client/`   |
+| **Server**   | Node.js (Express) | `mongoose`, `multer`, `axios`, `dotenv`    | 3001 | `Server/`   |
+| **ML Model** | Python (FastAPI)  | `tensorflow`, `numpy`, `uvicorn`           | 8000 | `AI-Model/` |
 
------
+---
 
-## ⚠️ Critical Setup Requirement (ML Model Access)
+## ⚠️ Critical Setup Requirement — ML Model Access
 
-The trained machine learning model file (`best_eye_cancer_model.h5`) is **essential** for the AI Model service to start and perform diagnostics.
+The trained ML model file `best_eye_cancer_model.h5` is **required** for the AI Model service to function.
+Due to its large size, it is not uploaded to GitHub.
 
-The file is too large to be uploaded to GitHub. **If you need access to the model file, please contact via email.**
+📩 **To request access:** [adithyayadav641@gmail.com](mailto:adithyayadav641@gmail.com)
+Alternatively, you can **re-train** the model using the included notebook (`model_train.ipynb`).
 
------
+---
 
 ## 🛠️ Installation and Setup
 
 ### Prerequisites
 
-  * **Node.js** (v18+)
-  * **Python** (v3.8+)
-  * **MongoDB** (accessible via the URI in `Server/.env`)
+* **Node.js** (v18 or higher)
+* **Python** (v3.8 or higher)
+* **MongoDB** (URI configured in `Server/.env`)
 
-### 1\. AI Model Service Setup (`AI-Model/`)
+---
 
-1.  Navigate to the AI Model directory:
-    ```bash
-    cd EyeCancer/AI-Model
-    ```
-2.  Install Python dependencies:
-    ```bash
-    pip install tensorflow numpy fastapi uvicorn python-multipart pillow
-    ```
-3.  **Action Required:** Place the **`best_eye_cancer_model.h5`** file inside this directory.
+### 1️⃣ AI Model Service Setup (`AI-Model/`)
 
-### 2\. Backend Server Setup (`Server/`)
+```bash
+cd EyeCancer/AI-Model
+pip install tensorflow numpy fastapi uvicorn python-multipart pillow
+```
 
-1.  Navigate to the Server directory:
-    ```bash
-    cd EyeCancer/Server
-    npm install
-    ```
-2.  Ensure your MongoDB connection string is correctly configured in the `.env` file.
+**Action Required:**
+Place `best_eye_cancer_model.h5` inside this directory,
+or re-train it using `model_train.ipynb`.
 
-### 3\. Frontend Client Setup (`Client/`)
+---
 
-1.  Navigate to the Client directory:
-    ```bash
-    cd EyeCancer/Client
-    npm install
-    ```
+### 2️⃣ Backend Server Setup (`Server/`)
 
------
+```bash
+cd EyeCancer/Server
+npm install
+```
 
-## ▶️ Quick Start (Running the Application)
+Ensure your MongoDB connection string is correctly configured in `.env`.
 
-Run all three services concurrently in separate terminal windows for the application to function end-to-end.
+---
 
-### Terminal 1: Start AI Model Server (Port 8000)
+### 3️⃣ Frontend Client Setup (`Client/`)
+
+```bash
+cd EyeCancer/Client
+npm install
+```
+
+---
+
+## ▶️ Quick Start
+
+Run all three services in **separate terminal windows** for the system to function end-to-end.
+
+**Terminal 1 – Start AI Model Server (Port 8000)**
 
 ```bash
 cd EyeCancer/AI-Model
 python main.py
 ```
 
-### Terminal 2: Start Backend API Server (Port 3001)
+**Terminal 2 – Start Backend API Server (Port 3001)**
 
 ```bash
 cd EyeCancer/Server
 npm start
 ```
 
-### Terminal 3: Start Frontend Client (Port 5173)
+**Terminal 3 – Start Frontend Client (Port 5173)**
 
 ```bash
 cd EyeCancer/Client
 npm run dev
 ```
 
-The application will be live at `http://localhost:5173`.
+Access the application at:
+👉 **[http://localhost:5173](http://localhost:5173)**
 
------
+---
 
-## 🤝 Support
+## 📄 Publication
 
-For questions, issues, or to request access to the trained model file:
+This project has been published as part of an academic and applied research initiative.
+You can read the full paper here:
+🔗 [**An Integrated Three-Tier Microservice Architecture for Deploying State-of-the-Art Ocular Cancer Detection Models**](https://doi.org/10.5281/zenodo.17409492)
 
-📧 **Email:** adithyayadav641@gmail.com
-🐛 **Issues:** [GitHub Issues](https://github.com/AR-47/EyeCancer/issues)
+*(Replace the above link with your actual publication URL — e.g., IEEE, Springer, or Medium.)*
 
+---
+
+## 🐛 Bugs and Support
+
+For any issues, questions, or model file access requests:
+
+* 📧 **Email:** [adithyayadav641@gmail.com](mailto:adithyayadav641@gmail.com)
+* 🧾 **GitHub Issues:** [Open an Issue](../../issues)
+
+---
+
+## 📁 Project Structure
+
+```
+EyeCancer/
+│
+├── AI-Model/
+│   ├── main.py
+│   ├── best_eye_cancer_model.h5
+│   └── model_train.ipynb
+│
+├── Server/
+│   ├── server.js
+│   ├── routes/
+│   ├── models/
+│   └── .env
+│
+├── Client/
+│   ├── src/
+│   ├── public/
+│   └── vite.config.js
+│
+└── README.md
+```
+
+---
