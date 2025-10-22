@@ -157,9 +157,11 @@ You can read the full paper here:
 🔗 [**An Integrated Three-Tier Microservice Architecture for Deploying State-of-the-Art Ocular Cancer Detection Models**](https://doi.org/10.5281/zenodo.17409492)
 
 ```
-## 🐛 Bugs and Support
 ```
+## 🐛 Bugs and Support
+
 For any issues, questions, or model file access requests:
 
 * 📧 **Email:** [adithyayadav641@gmail.com](mailto:adithyayadav641@gmail.com)
 * 🐛 **Issues:** [GitHub Issues](https://github.com/AR-47/EyeCancer/issues)
+```
