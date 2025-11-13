@@ -154,7 +154,7 @@ Access the application at:
 
 This project has been published as part of an academic and applied research initiative.
 You can read the full paper here:
-🔗 [**An Integrated Three-Tier Microservice Architecture for Deploying State-of-the-Art Ocular Cancer Detection Models**](https://doi.org/10.5281/zenodo.17409492)
+🔗 [**An Integrated Three-Tier Microservice Architecture for Deploying State-of-the-Art Ocular Cancer Detection Models**](https://doi.org/10.5281/zenodo.17603497)
 
 ---
 
