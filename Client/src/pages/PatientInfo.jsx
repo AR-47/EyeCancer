@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom"; // <-- CRITICAL FIX: ADD THIS IMPORT
 
 const PatientInfoPage = ({ 
   onSearch, 
@@ -136,14 +135,6 @@ const PatientInfoPage = ({
                   </p>
                 </div>
                 <div className="flex gap-3">
-                  {/* BUTTONS SECTION */}
-                  <Link to="/">
-                    <button
-                      className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors"
-                    >
-                      Back to Home
-                    </button>
-                  </Link>
                   <button
                     onClick={handlePrint}
                     className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors"
@@ -265,59 +256,73 @@ const PatientInfoPage = ({
             </div>
 
             {/* Previous Scans */}
-            {Array.isArray(patient.predictionResults) && patient.predictionResults.length > 0 && (
-              <div className="bg-white border border-gray-200 rounded-lg p-6 mt-8">
-                <h3 className="text-xl font-semibold text-gray-900 mb-4">
-                  Previous Scans
-                </h3>
-                <div className="space-y-6">
-                  {patient.predictionResults.map((scan, idx) => (
-                    <div key={scan._id || idx} className="border p-4 rounded-md shadow-sm bg-gray-50">
-                      <p className="text-gray-800 font-medium mb-2">
-                        Scan #{idx + 1} - {new Date(scan.createdAt).toLocaleString()}
-                      </p>
+{Array.isArray(patient.predictionResults) && patient.predictionResults.length > 0 && (
+  <div className="bg-white border border-gray-200 rounded-lg p-6 mt-8">
+    <h3 className="text-xl font-semibold text-gray-900 mb-4">
+      Previous Scans
+    </h3>
+    <div className="space-y-6">
+      {patient.predictionResults.map((scan, idx) => (
+        <div key={scan._id || idx} className="border p-4 rounded-md shadow-sm bg-gray-50">
+          <p className="text-gray-800 font-medium mb-2">
+            Scan #{idx + 1} - {new Date(scan.createdAt).toLocaleString()}
+          </p>
 
-                      <p className="mb-2">
-                        <strong>Prediction:</strong>{" "}
-                        {scan.classification_prediction === 0 ? "Benign" : "Malignant"}
-                      </p>
+          <p className="mb-2">
+            <strong>Prediction:</strong>{" "}
+            {scan.classification_prediction === 0 ? "Benign" : "Malignant"}
+          </p>
 
-                      <p className="mb-2">
-                        <strong>Probabilities:</strong>{" "}
-                        {/* Correctly calculate and display Benign/Malignant probabilities */}
-                        {typeof scan.classification_probabilities[0] === 'number' && (
-                            <>
-                              {/* Probability of Benign (0) is 1 - P(Malignant) */}
-                              <span key="p0">
-                                Benign: {((1 - scan.classification_probabilities[0]) * 100).toFixed(2)}% 
-                              </span>
-                              <span> | </span>
-                              
-                              {/* Probability of Malignant (1) is the actual score saved */}
-                              <span key="p1">
-                                Malignant: {(scan.classification_probabilities[0] * 100).toFixed(2)}%
-                              </span>
-                            </>
-                        )}
-                      </p>
+          <p className="mb-2">
+            <strong>Probabilities:</strong>{" "}
+            {scan.classification_probabilities.map((p, i) => (
+              <span key={i}>
+                {i === 0 ? "Benign" : "Malignant"}: {(p * 100).toFixed(2)}%
+                {i === 0 ? " | " : ""}
+              </span>
+            ))}
+          </p>
 
-                      <div className="flex flex-wrap gap-6 mt-4">
-                        {/* ONLY DISPLAY ORIGINAL IMAGE */}
-                        <div>
-                          <p className="text-sm text-gray-600 mb-1">Original Image</p>
-                          <img
-                            src={`data:image/jpeg;base64,${scan.original_image_base64}`}
-                            alt="Original"
-                            className="w-48 h-48 object-contain border rounded"
-                          />
-                        </div>
+          <div className="flex flex-wrap gap-6 mt-4">
+            {/* Original Image */}
+            <div>
+              <p className="text-sm text-gray-600 mb-1">Original Image</p>
+              <img
+                src={`data:image/jpeg;base64,${scan.original_image_base64}`}
+                alt="Original"
+                className="w-48 h-48 object-contain border rounded"
+              />
+            </div>
 
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+            {/* Segmentation Mask */}
+            <div>
+              <p className="text-sm text-gray-600 mb-1">Segmentation Mask</p>
+              <img
+                src={`data:image/png;base64,${scan.segmentation_mask_base64}`}
+                alt="Mask"
+                className="w-48 h-48 object-contain border rounded"
+              />
+            </div>
+
+            {/* Overlay Image */}
+            {/* Segmentation Mask */}
+            <div>
+              <p className="text-sm text-gray-600 mb-1">Segmentation Mask</p>
+              <img
+                src={`data:image/png;base64,${scan.overlay_image_base64}`}
+                alt="Mask"
+                className="w-48 h-48 object-contain border rounded"
+              />
+            </div>
+
+
+
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+)}
 
 
             {/* Record Information */}

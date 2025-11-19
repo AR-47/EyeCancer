@@ -49,30 +49,19 @@ app.post('/analyze', upload.single('file'), async (req, res) => {
       contentType: file.mimetype,
     });
 
-    // CRITICAL: Ensure the response structure is handled carefully
     const response = await axios.post('http://localhost:8000/predict', formData, {
       headers: formData.getHeaders(),
     });
 
-    const aiResult  = response.data;
+    const result  = response.data;
 
-    console.log('Saving prediction result:', aiResult);
+     console.log('Saving prediction result:', response.data);
 
-    // 🛑 CRITICAL FIX: Explicitly map FastAPI keys to Mongoose schema keys
-    const dbPayload = {
-        classification_prediction: aiResult.prediction_class === 'Disease/Abnormal' ? 1 : 0, 
-        
-        classification_probabilities: [aiResult.probability_score], 
-        
-        original_image_base64: aiResult.original_image_base64,
-        overlay_image_base64: aiResult.overlay_image_base64,
-        segmentation_mask_base64: aiResult.segmentation_mask_base64,
-        segmentation_shape: aiResult.segmentation_shape,
-        message: aiResult.message,
-    };
+ 
+
+    // Save result to DB
    
-    // Save the correctly mapped result to DB
-    const savedResult = await PredictionResult.create(dbPayload);
+    const savedResult = await PredictionResult.create(result);
 
     // Add result to user's predictionResults
     user.predictionResults.push(savedResult._id);
@@ -90,23 +79,7 @@ app.post('/analyze', upload.single('file'), async (req, res) => {
 
   } catch (error) {
     console.error('Error in /analyze:', error.message);
-    
-    // --- START OF CRITICAL ERROR HANDLING FIX ---
-    if (error.response) {
-        const statusCode = error.response.status;
-        const aiError = error.response.data;
-
-        if (statusCode >= 400 && statusCode < 500) {
-            return res.status(statusCode).json({ 
-                success: false, 
-                message: aiError.message || 'Client-side issue detected by AI service.',
-                details: aiError 
-            });
-        }
-    }
-
-    // Default to a 500 server error for all other unhandled issues
-    res.status(500).json({ success: false, message: 'Internal server error during analysis.' });
+    res.status(500).json({ success: false, error: error.message });
   }
 });
 

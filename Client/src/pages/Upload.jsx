@@ -99,19 +99,19 @@ export default function Upload() {
             navigate("/result", {
                 state: {
                   cancerDetected: response.data.result.classification_prediction === 1,
-                  cancerProbability: response.data.result.classification_probabilities[0],
+                  cancerProbability: response.data.result.classification_probabilities[1],
                   message: response.data.result.message,
                   success: true,
                   processedImage: {
                     base64: response.data.result.segmentation_mask_base64,
                   },
                   maskedImage: {
-                    base64: response.data.result.overlay_image_base64,
+                    base64: response.data.result.overlay_image_base64, // ✅ overlay = masked
                   },
                   originalImage: {
-                    base64: response.data.result.original_image_base64 || selectedImages[0].preview.split(',')[1],
+                    base64: selectedImages[0].preview.split(',')[1],
                   },
-                  user: response.data.user
+                  user: response.data.user // Pass user data to Result page
                 }
               });
               
@@ -119,22 +119,7 @@ export default function Upload() {
 
         } catch (error) {
             console.error('Error uploading images:', error);
-
-            let errorMessage = 'An unknown error occurred during upload. Please check your network connection.';
-            
-            if (error.response) {
-              const serverMessage = error.response.data?.message;
-              if (serverMessage) {
-                errorMessage = serverMessage;
-              } else {
-                errorMessage = `Server Error (${error.response.status}). See console for details.`;
-              }
-            } else if (error.request) {
-              errorMessage = 'Network Error: Cannot connect to the API Gateway (localhost:3001).';
-            }
-            
-            alert(`❌ Upload failed: ${errorMessage}`);
-            
+            alert('Upload failed. Please check the console for details.');
         } finally {
             setIsUploading(false);
         }

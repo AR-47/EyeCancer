@@ -38,7 +38,7 @@ export default function Results() {
       return;
     }
     setAnalysisResult(location.state);
-    setLoading();
+    setLoading(false); // Ensure loading is set to false after data is set
   }, [location.state, navigate]);
 
   if (loading) {
@@ -96,6 +96,34 @@ export default function Results() {
 
         {/* Image Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+          {/* Overlayed Image */}
+          <div className="bg-white rounded-xl shadow-lg p-4">
+            <h3 className="text-lg font-medium text-gray-800 mb-2 text-center">
+              Overlayed Image
+            </h3>
+            <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
+              <img
+                src={`data:image/png;base64,${analysisResult.maskedImage?.base64}`}
+                alt="Overlayed"
+                className="w-full h-full object-cover"
+              />
+            </div>
+          </div>
+
+          {/* Masked Image */}
+          <div className="bg-white rounded-xl shadow-lg p-4">
+            <h3 className="text-lg font-medium text-gray-800 mb-2 text-center">
+              Masked Image
+            </h3>
+            <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
+              <img
+                src={`data:image/png;base64,${analysisResult.processedImage?.base64}`}
+                alt="Masked"
+                className="w-full h-full object-cover"
+              />
+            </div>
+          </div>
+
           {/* Original Image */}
           <div className="bg-white rounded-xl shadow-lg p-4">
             <h3 className="text-lg font-medium text-gray-800 mb-2 text-center">
@@ -116,22 +144,22 @@ export default function Results() {
           <h2 className="text-2xl font-semibold text-gray-800 mb-4">
             Result Summary
           </h2>
-          <div className="text-lg text-gray-700 space-y-2">
-            <p>
-              <span className="font-medium">Prediction:</span>{" "}
-              {analysisResult.cancerDetected ? "Yes" : "No"}
+          
+          <div className="mt-4 space-y-2">
+            <p className="text-lg font-semibold text-gray-700">
+                Diagnosis: 
+                {/* Changed 'prediction === 1' to 'analysisResult.cancerDetected' to match your file */}
+                <span className={analysisResult.cancerDetected ? "text-red-600 ml-2" : "text-green-600 ml-2"}>
+                    {analysisResult.cancerDetected ? "Malignant (Cancer Detected)" : "Benign (No Cancer Detected)"}
+                </span>
             </p>
-            <p>
-              <span className="font-medium">Probability:</span>{" "}
-              {(analysisResult.cancerProbability * 100).toFixed(2)}%
-            </p>
-            <p>
-              <span className="font-medium">Message:</span>{" "}
-              {analysisResult.message}
-            </p>
-            <p>
-              <span className="font-medium">Success:</span>{" "}
-              {analysisResult.success ? "True" : "False"}
+
+            <p className="text-lg font-semibold text-gray-700">
+                Confidence: 
+                <span className="ml-2 text-blue-600">
+                    {/* Changed 'probability' to 'analysisResult.cancerProbability' */}
+                    {(analysisResult.cancerProbability*100).toFixed(4 )}%
+                </span>
             </p>
           </div>
         </div>

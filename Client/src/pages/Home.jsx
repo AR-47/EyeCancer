@@ -41,6 +41,7 @@ const Box = () => {
             </p>
           </div>
         </Link>
+
         {/* Patient History Box */}
         <Link
           to={"/patient"}
