@@ -1,20 +1,20 @@
 import tensorflow as tf
-from tensorflow.keras.applications.resnet50 import preprocess_input
-import numpy as np
+from tensorflow.keras.models import load_model
+from tensorflow.keras.layers import DepthwiseConv2D
+from tensorflow.keras.applications.efficientnet_v2 import preprocess_input
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from PIL import Image
 import io
+import numpy as np
 import base64
-
-# --- 1. CONFIGURATION ---
-MODEL_FILE_PATH = 'best_eye_cancer_model.h5'
-IMG_SIZE = 224
-CLASS_NAMES = ['Normal/Healthy', 'Disease/Abnormal']
+import os
+import sys
 
 app = FastAPI()
 
+# CORS Configuration
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -23,75 +23,113 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# --- 2. LOAD MODEL ON STARTUP ---
-try:
-    
-    model = tf.keras.models.load_model(MODEL_FILE_PATH)
-    print(f"TensorFlow model loaded successfully from {MODEL_FILE_PATH}")
-except Exception as e:
-    print(f"Error loading model: {e}")
-    model = None 
+# --- Configuration ---
+MODEL_PATH = "best_finetuned.h5"
+IMG_SIZE = (224, 224)
 
-# --- 3. PREPROCESSING FUNCTION ---
-def preprocess_image_tf(image: Image.Image):
-    """
-    Preprocesses a PIL image for input into the ResNet50 model.
-    """
-    image = image.resize((IMG_SIZE, IMG_SIZE))
-    img_array = tf.keras.preprocessing.image.img_to_array(image)
+# --- Global Model Variable ---
+model = None
+
+# --- Fix for 'DepthwiseConv2D' Error ---
+class FixedDepthwiseConv2D(DepthwiseConv2D):
+    def __init__(self, **kwargs):
+        kwargs.pop('groups', None)
+        super().__init__(**kwargs)
+
+# --- Load Model at Startup ---
+print(f"Current Working Directory: {os.getcwd()}")
+if os.path.exists(MODEL_PATH):
+    print(f"Found model file at: {MODEL_PATH}")
+    try:
+        model = load_model(
+            MODEL_PATH, 
+            compile=False, 
+            custom_objects={'DepthwiseConv2D': FixedDepthwiseConv2D}
+        )
+        print("✅ Model loaded successfully!")
+    except Exception as e:
+        print(f"❌ Error loading Keras model: {e}")
+else:
+    print(f"❌ CRITICAL ERROR: Model file '{MODEL_PATH}' not found!")
+    print(f"Please move 'best_finetuned.h5' into the folder: {os.getcwd()}")
+
+def preprocess_image(image: Image.Image):
+    """Preprocess the image to match training conditions (EfficientNetV2)"""
+    if image.mode != "RGB":
+        image = image.convert("RGB")
+    
+    image = image.resize(IMG_SIZE)
+    img_array = np.array(image)
     img_array = np.expand_dims(img_array, axis=0)
     img_array = preprocess_input(img_array)
     return img_array
 
-# --- 4. PREDICTION ENDPOINT ---
+def image_to_base64(image: Image.Image) -> str:
+    """Helper to convert PIL Image to Base64 string"""
+    buffered = io.BytesIO()
+    image.save(buffered, format="PNG")
+    return base64.b64encode(buffered.getvalue()).decode("utf-8")
+
+@app.post("/analyze")
 @app.post("/predict")
-async def predict_eye_status(file: UploadFile = File(...)):
-    if model is None:
-        return JSONResponse(status_code=500, content={"error": "Model failed to load on startup."})
+async def predict(file: UploadFile = File(...)):
+    global model
     
+    if model is None:
+        return JSONResponse(
+            status_code=500, 
+            content={"error": "Model not loaded. Check server terminal."}
+        )
+
     try:
+        # 1. Read and Process Image
         contents = await file.read()
-        original_image_base64_encoded = base64.b64encode(contents).decode('utf-8')
-        image = Image.open(io.BytesIO(contents)).convert("RGB")
-        width, height = image.size
-        # Reject images where the aspect ratio deviates more than 40% from a square (1:1)
-        if abs(width - height) / max(width, height) > 0.4:
-            return JSONResponse(status_code=400, content={
-                "prediction_class": "Error",
-                "probability_score": 0.0,
-                "message": "Image isn't of eyes, please upload the correct image",
-                "original_image_base64": original_image_base64_encoded,
-                "segmentation_mask_base64": "", 
-                "overlay_image_base64": "",
-                "segmentation_shape": [],
-            })
-        input_tensor = preprocess_image_tf(image)
+        image = Image.open(io.BytesIO(contents))
+        processed_img = preprocess_image(image)
         
-        with tf.device('/cpu:0'):
-            prediction = model.predict(input_tensor)
-            
-        probability_of_disease = prediction[0][0]
-        predicted_class_index = int(probability_of_disease > 0.5)
-        predicted_class_name = CLASS_NAMES[predicted_class_index]
+        # 2. Predict
+        raw_score = model.predict(processed_img, verbose=0)[0][0]
+        
+        # --- FIX: INVERTING LOGIC ---
+        # Since folders were likely alphabetical: 0=Cancer, 1=Non_Cancer
+        # The model outputs the probability of Class 1 (Non-Cancer).
+        
+        non_cancer_prob = float(raw_score)
+        cancer_prob = 1.0 - non_cancer_prob
+        
+        # If Cancer probability is higher (>0.5), predict Cancer (1)
+        classification_pred = 1 if cancer_prob >= 0.5 else 0
+        
+        # Order: [Prob(Non-Cancer), Prob(Cancer)]
+        classification_probabilities = [non_cancer_prob, cancer_prob]
+        
+        print(f"Raw Score (Non-Cancer Prob): {raw_score:.4f}")
+        print(f"Calculated Cancer Prob: {cancer_prob:.4f} -> Prediction: {'Cancer' if classification_pred == 1 else 'Non-Cancer'}")
+
+        # 3. Output Formatting
+        display_image = image.resize((256, 256))
+        display_base64 = image_to_base64(display_image)
+
         return JSONResponse(content={
-            "prediction_class": predicted_class_name,
-            "probability_score": float(probability_of_disease),
-            "message": "Classification successful",
-            "original_image_base64": original_image_base64_encoded,
-            "segmentation_mask_base64": "", 
-            "overlay_image_base64": "",
-            "segmentation_shape": [],
+            "classification_prediction": classification_pred,
+            "classification_probabilities": classification_probabilities,
+            "segmentation_shape": [224, 224],
+            "segmentation_mask_base64": display_base64,
+            "original_image_base64": display_base64,
+            "overlay_image_base64": display_base64,
+            "message": "Prediction successful"
         })
-            
+
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         return JSONResponse(status_code=500, content={"error": str(e)})
 
 @app.get("/")
 async def root():
-    return {"message": "TensorFlow Eye Disease Classification Server is running"}
+    status = "Model Ready" if model else "Model NOT Loaded"
+    return {"message": f"TensorFlow API Running. Status: {status}"}
 
-# --- 5. RUN THE SERVER ---
 if __name__ == "__main__":
     import uvicorn
-    # This runs the server on http://127.0.0.1:8000
     uvicorn.run(app, host="0.0.0.0", port=8000)
