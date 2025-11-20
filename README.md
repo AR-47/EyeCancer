@@ -274,7 +274,7 @@ data/
 
 This project is supported by a peer-reviewed research paper published on Zenodo.
 
-🔗 DOI: **[10.5281/ZENODO.17603497](https://zenodo.org/records/17603497)**
+🔗 DOI: **[10.5281/ZENODO.17603497](https://doi.org/10.5281/zenodo.17662144)**
 📘 Paper Title: **[An Integrated Three-Tier Microservice Architecture for Deploying State-of-the-Art Ocular Cancer Detection Models](https://zenodo.org/records/17603497)**
 📅 Published: 2025
 
